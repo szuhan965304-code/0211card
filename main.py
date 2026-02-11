@@ -1,4 +1,3 @@
-import os
 import streamlit as st
 import pandas as pd
 import joblib
@@ -9,71 +8,44 @@ st.set_page_config(page_title="金融信用預測儀表板", layout="wide")
 
 # 2. 定義快取函式 (提升效能)
 @st.cache_resource
-def load_model(model_name: str):
+def load_model(model_name):
     # 這裡的檔名需與你下載的 joblib 檔案名稱一致
     model_files = {
         "KNN": "k-nearest_neighbors_pipeline.joblib",
         "LogisticRegression": "logistic_regression_pipeline.joblib",
-        "XGBoost": "xgboost_classifier_pipeline.joblib",
-        # 如果你之後要打開 RandomForest，記得把下面兩行一起打開
-        # "RandomForest": "randomforest_classifier_pipeline.joblib",
+        "RandomForest": "randomforest_classifier_pipeline.joblib",
+        "XGBoost": "xgboost_classifier_pipeline.joblib"
     }
-
-    if model_name not in model_files:
-        st.error(f"❌ 找不到模型設定：{model_name}")
-        st.stop()
-
-    path = model_files[model_name]
-    if not os.path.exists(path):
-        st.error(
-            f"❌ 找不到模型檔：{path}\n\n"
-            "請確認模型檔已上傳到 GitHub repo 根目錄，且檔名完全一致。"
-        )
-        st.stop()
-
-    return joblib.load(path)
+    return joblib.load(model_files[model_name])
 
 @st.cache_data
 def load_data():
+    import os
     local_csv = "UCI_Credit_Card.csv"
-
-    # ✅ Debug：在雲端直接顯示目前資料夾有哪些檔案（用來抓 CSV 檔名/位置問題）
-    st.write("📁 Files in current directory:", os.listdir("."))
-
-    # ✅ 永遠只讀本地，不走網路 URL（避免 404 / 網路不穩）
-    if not os.path.exists(local_csv):
-        st.error(
-            f"❌ 找不到資料檔：{local_csv}\n\n"
-            "請確認：\n"
-            "1) CSV 已上傳到 GitHub repo 根目錄（跟 main.py 同一層）\n"
-            "2) 檔名大小寫完全一致：UCI_Credit_Card.csv\n"
-            "3) 不是 UCI_Credit_Card (1).csv 或 UCI_Credit_Card.csv.csv"
-        )
-        st.stop()
-
-    df = pd.read_csv(local_csv)
+    if os.path.exists(local_csv):
+        df = pd.read_csv(local_csv)
+    else:
+        url = "https://raw.githubusercontent.com/ywang166/Credit-Card-Default-Prediction/master/data/default%20of%20credit%20card%20clients.csv"
+        df = pd.read_csv(url, skiprows=1)
 
     # 分離特徵與標籤 (為了之後預測用)
     cols = df.columns.tolist()
     possible_labels = [
-        "default payment next month",
-        "default.payment.next.month",
-        "default_payment_next_month",
-        "default.payment_next_month",
+        'default payment next month',
+        'default.payment.next.month',
+        'default_payment_next_month',
+        'default.payment_next_month'
     ]
-
     label_col = next((c for c in cols if c in possible_labels), None)
     if label_col is None:
         for c in cols:
-            if "default" in c.lower() and "next" in c.lower():
+            if 'default' in c.lower() and 'next' in c.lower():
                 label_col = c
                 break
-
     if label_col is None:
-        st.error("❌ 找不到標籤欄位 (default ...)，請檢查 CSV 欄位名稱")
-        st.stop()
+        raise ValueError("找不到標籤欄位 (default ...)，請檢查 CSV 欄位名稱")
 
-    id_col = next((c for c in cols if c.lower() == "id"), None)
+    id_col = next((c for c in cols if c.lower() == 'id'), None)
     drop_cols = [label_col]
     if id_col:
         drop_cols.insert(0, id_col)
@@ -82,26 +54,19 @@ def load_data():
     y = df[label_col]
     return df, X, y
 
-
 # 3. 載入資料
 df_full, X, y = load_data()
 
 # --- 左側選單 (Sidebar) ---
 st.sidebar.title("🤖 模型控制中心")
-
-# ✅ 先移除 RandomForest（你目前模型檔那行是註解掉的）
 selected_name = st.sidebar.selectbox(
     "請選擇分類模型：",
-    ["KNN", "LogisticRegression", "XGBoost"]
+    ["KNN", "LogisticRegression", "RandomForest", "XGBoost"]
 )
-
 model = load_model(selected_name)
 
 st.sidebar.divider()
-st.sidebar.info(
-    f"當前模型：{selected_name}\n\n"
-    "這是一個包含 Scaler, PCA 與 Classifier 的完整 Pipeline。"
-)
+st.sidebar.info(f"當前模型：{selected_name}\n\n這是一個包含 Scaler, PCA 與 Classifier 的完整 Pipeline。")
 
 # --- 右側主畫面 ---
 st.title("💳 信用卡違約風險預測展示")
@@ -116,7 +81,7 @@ st.divider()
 st.subheader("🎯 即時預測測試")
 
 # 初始化 session_state 用於儲存抽樣結果
-if "sample_idx" not in st.session_state:
+if 'sample_idx' not in st.session_state:
     st.session_state.sample_idx = None
 
 if st.button("🎲 隨機抽取一個樣本進行預測"):
@@ -125,41 +90,37 @@ if st.button("🎲 隨機抽取一個樣本進行預測"):
 # 如果已經抽樣，則進行顯示與預測
 if st.session_state.sample_idx is not None:
     idx = st.session_state.sample_idx
-
+    
     # 取出單筆資料 (DataFrame 格式，Pipeline 才能吃)
     sample_data = X.iloc[[idx]]
     actual_label = y.iloc[idx]
-
+    
     st.write(f"**抽取的樣本索引：** `{idx}`")
-    st.dataframe(sample_data, use_container_width=True)
-
-    # 執行 Pipeline 預測
+    st.dataframe(sample_data)
+    
+    # 執行 Pipeline 預測 (自動內含 Scaling 與 PCA)
     prediction = model.predict(sample_data)[0]
-
-    # 預測機率（部分模型/管線可能沒有 predict_proba，保護一下）
-    prob = None
-    if hasattr(model, "predict_proba"):
-        prob = model.predict_proba(sample_data)[0][1]
-
+    # 預測機率 (XGB, RF, LR 支援，KNN 也支援)
+    prob = model.predict_proba(sample_data)[0][1]
+    
     # --- 下方顯示結果 ---
     st.subheader("🚀 預測結果")
-
+    
+    # 使用欄位排版顯示指標
     col1, col2, col3 = st.columns(3)
-
+    
     with col1:
         res_text = "⚠️ 違約" if prediction == 1 else "✅ 正常"
         st.metric("模型預測", res_text)
-
+        
     with col2:
         actual_text = "⚠️ 違約" if actual_label == 1 else "✅ 正常"
         st.metric("真實情況", actual_text)
-
+        
     with col3:
-        if prob is not None:
-            st.metric("違約機率", f"{prob:.2%}")
-        else:
-            st.metric("違約機率", "此模型不支援")
+        st.metric("違約機率", f"{prob:.2%}")
 
+    # 比對結果
     if prediction == actual_label:
         st.success("🎉 預測正確！該模型成功捕捉到樣本特徵。")
     else:
@@ -167,3 +128,4 @@ if st.session_state.sample_idx is not None:
 
 
    
+
