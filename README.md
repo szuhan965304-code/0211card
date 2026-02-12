@@ -34,6 +34,6 @@ Multiple classifiers are implemented and deployed via Streamlit for interactive 
 - Confusion Matrix
 
 ## 💡 Key Learning
-- Comparing different classification models (Logistic, KNN, Random Forest, XGBoost)
-- Applying proper train/test split to ensure fair evaluation
-- Deploying machine learning models into an interactive web application
+- Implementing multiple classification models for comparison
+- Applying proper train/test split before model training
+- Deploying a machine learning model using Streamlit
