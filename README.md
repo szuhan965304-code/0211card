@@ -1,39 +1,71 @@
-# Credit Default Classification Web App
+# Credit Card Default Prediction (Classification Project)
 
 ## 📌 Project Overview
-This project builds a machine learning classification model to predict credit card default risk. 
-Multiple classifiers are implemented and deployed via Streamlit for interactive prediction.
+This project builds multiple classification models to predict credit card default risk.  
+The objective is to compare different machine learning algorithms and evaluate model performance using proper train/test split to avoid data leakage.
+
+---
 
 ## 🚀 Live Demo
-🔗 Streamlit App: https://0211card-6789h3aztjlghxrtjx8gpq.streamlit.app
+🔗 Streamlit App:  
+https://0211card-6789h3aztjlghxrtjx8gpq.streamlit.app
+
+---
 
 ## 🛠 Tech Stack
 - Python
+- Pandas
+- NumPy
 - scikit-learn
-- Pandas / NumPy
-- Streamlit
-- GitHub (version control)
-
-## 📊 Machine Learning Pipeline
-1. Data preprocessing
-2. Train/Test split (with stratification)
-3. Feature scaling (for distance-based models)
-4. Model training
-5. Evaluation using Accuracy & F1-score
-6. Model deployment via Streamlit
-
-## 🤖 Models Used
-- Logistic Regression
-- K-Nearest Neighbors (KNN)
-- Random Forest
 - XGBoost
+- Streamlit
+- Git / GitHub
 
-## 📈 Evaluation Metrics
-- Accuracy
-- F1-score
-- Confusion Matrix
+---
 
-## 💡 Key Learning
-- Implementing multiple classification models for comparison
-- Applying proper train/test split before model training
-- Deploying a machine learning model using Streamlit
+## 🔎 Project Workflow
+
+1. **Data Cleaning & Preprocessing**
+   - Handling missing values
+   - Feature formatting
+
+2. **Feature Engineering**
+   - Encoding categorical variables
+   - Feature scaling (for distance-based models)
+
+3. **Train/Test Split**
+   - Proper data splitting before model training
+   - Avoiding data leakage
+
+4. **Model Training**
+   - Logistic Regression
+   - K-Nearest Neighbors (KNN)
+   - Random Forest
+   - XGBoost
+
+5. **Model Evaluation**
+   - Accuracy
+   - F1-score
+   - Model comparison
+
+6. **Deployment**
+   - Interactive web application built using Streamlit
+
+---
+
+## 💡 Key Takeaways
+
+- Comparing performance across linear, distance-based, and tree-based models
+- Applying appropriate evaluation metrics for classification problems
+- Understanding the importance of proper train/test split
+- Deploying machine learning models into a web application
+
+---
+
+## 📂 Repository Structure
+
+- `main.py` → Streamlit application
+- `pipeline.joblib` → Trained model pipeline
+- `requirements.txt` → Project dependencies
+- `data.csv` → Dataset
+
