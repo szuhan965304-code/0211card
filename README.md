@@ -34,6 +34,6 @@ Multiple classifiers are implemented and deployed via Streamlit for interactive 
 - Confusion Matrix
 
 ## 💡 Key Learning
-- Understanding differences between distance-based and tree-based models
-- Avoiding data leakage in ML pipeline
-- Deploying ML models into a web application
+- Comparing different classification models (Logistic, KNN, Random Forest, XGBoost)
+- Applying proper train/test split to ensure fair evaluation
+- Deploying machine learning models into an interactive web application
